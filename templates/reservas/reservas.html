@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}
+Reservas
+{% endblock title %}
+{% block header_text %}
+Reservas
+{% endblock header_text %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Listado de Reservas</h3>
+        <div class="text-right">
+            <button type="button" class="btn btn-success btn-sm agregar-reserva" data-toggle="modal" data-target="#reserva-modal-nuevo">
+                <i class="fas fa-plus">
+                </i>
+                Nueva Reserva
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="datatable_reservas" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Fecha y Hora</th>
+                    <th>Seña</th>
+                    <th>Pagado Total</th>
+                    <th>Operador</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                <tr>
+                    <td>{{reserva.id}}</td>
+                    <td>{{reserva.cliente.nombre}}</td>
+                    <td>{{ reserva.fecha_inicio|date:"d/m/Y" }} a {{ reserva.fecha_fin|date:"d/m/Y" }} <br>
+                        {{ reserva.fecha_inicio|date:"H:i" }} - {{ reserva.fecha_fin|date:"H:i" }}</td>
+                    <td>
+                        {% if reserva.senado %}
+                            <span class="badge bg-success">Señado</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reserva.pagado %}
+                            <span class="badge bg-success">Pagado</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td>{{reserva.operador.first_name}}</td>
+                    <td class="project-actions text-center">
+                        <button type="button" class="btn btn-info btn-sm editar-reserva" data-toggle="modal"
+                            data-target="#reserva-modal-editar" data-reserva-id="{{ reserva.id }}">
+                            <i class="fas fa-pencil-alt">
+                            </i>
+                            Editar
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm eliminar-reserva" data-toggle="modal"
+                            data-target="#reserva-modal-eliminar" data-reserva-id="{{ reserva.id }}">
+                            <i class="fas fa-trash">
+                            </i>
+                            Cancelar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+
+<div class="modal fade" id="reserva-modal-nuevo">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Nueva Reserva</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-new-reserva">
+                
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<div class="modal fade" id="reserva-modal-editar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Editar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-editar-reserva">
+                
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="reserva-modal-eliminar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Eliminar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-delete-reserva">
+                
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+{% endblock content %}

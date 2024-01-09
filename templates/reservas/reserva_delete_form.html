@@ -1,0 +1,55 @@
+<!-- reserva_delete_form.html -->
+<form id="form-eliminar-reserva" data-reserva-id="{{ reserva.id }}">
+    {% csrf_token %}
+    <div class="modal-body">
+        <input type="hidden" id="reserva-id" name="reserva_id" value="{{ reserva.id }}">
+        <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+    </div>
+    <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="eliminar-reserva">Cancelar Reserva</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        // Manejar el evento click del botón 'Eliminar'
+        $('#eliminar-reserva').on('click', function (e) {
+            e.preventDefault();
+            var reservaId = $('#reserva-id').val();
+
+            // Realizar la solicitud AJAX para eliminar la reserva
+            $.ajax({
+                url: '{% url "reserva_app:reserva_delete" 1 %}'.replace('1', reservaId),
+                type: 'POST',
+                data: $('#form-eliminar-reserva').serialize(),
+                success: function (data) {
+                    // Verificar el estado de la respuesta
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Reserva cancelada',
+                            text: data.message,
+                            confirmButtonText: 'Ir a Reservas',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Si el usuario hace clic en "Ir a Reservas", redirige
+                                window.location.href = '/reservas/reservas/';
+                            }
+                        });
+                    } else {
+                        // En caso de error, mostrar SweetAlert con el mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.errors.__all__[0], 
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>

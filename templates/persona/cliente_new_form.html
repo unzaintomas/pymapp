@@ -1,0 +1,72 @@
+<form id="form-nuevo-cliente" action="{% url 'persona_app:cliente_create' %}" method="post">
+    <div class="modal-body">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    {{ form.nombre.label_tag }}
+                    {{ form.nombre }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.celular.label_tag }}
+                    {{ form.celular }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="guardar-cliente">Guardar</button>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        // Manejar el evento click del botón 'Guardar'
+        $('#guardar-cliente').on('click', function (e) {
+            e.preventDefault();
+
+            // Realizar la validación del formulario antes de enviarlo
+            $.ajax({
+                url: '{% url "persona_app:cliente_create" %}',
+                type: 'POST',
+                data: $('#form-nuevo-cliente').serialize(),
+                success: function (data) {
+                    // Verificar el estado de la respuesta
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cliente registrado',
+                            text: data.message,  
+                            confirmButtonText: 'Continuar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Si el usuario hace clic en "Continuar", redirige
+                                window.location.href = '/personas/clientes/';
+                            }
+                        });
+                    } else {
+                        // En caso de error, mostrar SweetAlert con el mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.errors.__all__[0],  
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>

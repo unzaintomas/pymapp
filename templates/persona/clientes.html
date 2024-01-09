@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block title %}
+Clientes
+{% endblock title %}
+{% block header_text %}
+Clientes
+{% endblock header_text %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Listado de Clientes</h3>
+        <div class="text-right">
+            <button type="button" class="btn btn-success btn-sm agregar-cliente" data-toggle="modal" data-target="#cliente-modal-nuevo">
+                <i class="fas fa-plus">
+                </i>
+                Agregar Cliente
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="datatable_clientes" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th style="width: 1%">
+                        #
+                    </th>
+                    <th style="width: 30%">
+                        Nombre
+                    </th>
+                    <th style="width: 15%">
+                        Telefono / Celular
+                    </th>
+                    <th style="width: 15%">
+                        Email
+                    </th>
+                    <th style="width: 40%" class="text-center">
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.id }}</td>
+                    <td>{{ cliente.nombre }}</td>
+                    <td>{{ cliente.celular }}</td>
+                    <td>{{ cliente.email }}</td>
+                    <td class="project-actions text-center">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                            data-target="#cliente-modal-reservas" data-cliente-id="{{ cliente.id }}">
+                            <i class="fas fa-folder">
+                            </i>
+                            Reservas
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm editar-cliente" data-toggle="modal"
+                            data-target="#cliente-modal-editar" data-cliente-id="{{ cliente.id }}">
+                            <i class="fas fa-pencil-alt">
+                            </i>
+                            Editar
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm eliminar-cliente" data-toggle="modal"
+                            data-target="#cliente-modal-eliminar" data-cliente-id="{{ cliente.id }}">
+                            <i class="fas fa-trash">
+                            </i>
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="cliente-modal-nuevo">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Nuevo Cliente</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-new-cliente">
+
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="cliente-modal-reservas">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Reservas</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="reservas-container">
+                
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="cliente-modal-editar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Editar datos del cliente</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body-editar-cliente">
+                
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="cliente-modal-eliminar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Eliminar Cliente</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-eliminar-cliente">
+                
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+{% endblock content %}

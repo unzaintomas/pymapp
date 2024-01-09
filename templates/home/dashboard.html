@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}
+    Dashboard
+{% endblock title %}
+{% block header_text %}
+    Hola! {% if user.is_authenticated %}
+    {{ user.first_name }} {{ user.last_name }}
+  {% else %}
+    Invitado
+  {% endif %}
+{% endblock header_text %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-lg-6 col-12">
+      <!-- small box -->
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3>{{ reservas_no_canceladas }}</h3>
+
+          <h5>Reservas</h5>
+        </div>
+        <div class="icon">
+          <i class="ion ion-calendar"></i>
+        </div>
+      </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-6 col-12">
+      <!-- small box -->
+      <div class="small-box bg-success">
+        <div class="inner">
+          <h3>{{ recaudado }} <sup style="font-size: 20px">Gs.</sup></h3>
+
+          <h5>Recaudado</h5>
+        </div>
+        <div class="icon">
+          <i class="ion ion-stats-bars"></i>
+        </div>
+      </div>
+    </div>
+</div>
+  <!-- /.row -->
+<div class="row mb-2">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-calendar mr-1"></i>
+                  Reservas
+                </h3>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div id="calendario"></div>
+              </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock content %}

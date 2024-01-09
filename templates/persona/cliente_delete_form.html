@@ -1,0 +1,53 @@
+<form id="form-eliminar-cliente" data-cliente-id="{{ cliente.id }}">
+    <div class="modal-body">
+        {% csrf_token %}
+        <input type="hidden" id="cliente-id" name="cliente_id" value="{{ cliente.id }}">
+        <p>¿Está seguro de que desea eliminar este cliente?</p>
+    </div>
+    <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-danger" id="eliminar-cliente">Eliminar</button>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        // Manejar el evento click del botón 'Eliminar'
+        $('#eliminar-cliente').on('click', function (e) {
+            e.preventDefault();
+            var clienteId = $('#cliente-id').val();
+
+            // Realizar la solicitud AJAX para eliminar el cliente
+            $.ajax({
+                url: '{% url "persona_app:cliente_delete" 1 %}'.replace('1', clienteId),
+                type: 'POST',
+                data: $('#form-eliminar-cliente').serialize(),
+                success: function (data) {
+                    // Verificar el estado de la respuesta
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cliente eliminado',
+                            text: data.message,
+                            confirmButtonText: 'Continuar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Si el usuario hace clic en "Continuar", redirige
+                                window.location.href = '/personas/clientes/';
+                            }
+                        });
+                    } else {
+                        // En caso de error, mostrar SweetAlert con el mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.errors.__all__[0],  
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>

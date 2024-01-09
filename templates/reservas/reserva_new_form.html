@@ -1,0 +1,115 @@
+<form id="form-nueva-reserva" action="{% url 'reserva_app:reserva_create' %}" method="post">
+    <div class="modal-body">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.fecha_inicio.label_tag }}
+                    <div class="input-group date" id="reservacioninicio" data-target-input="nearest">
+                        {{ form.fecha_inicio }}
+                        <div class="input-group-append" data-target="#reservacioninicio" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.fecha_fin.label_tag }}
+                    <div class="input-group date" id="reservacionfin" data-target-input="nearest">
+                        {{ form.fecha_fin }}
+                        <div class="input-group-append" data-target="#reservacionfin" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    {{ form.cliente.label_tag }}
+                    {{ form.cliente }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    {{ form.precio.label_tag }}
+                    {{ form.precio }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group clearfix">
+                    <div class="icheck-primary d-inline">
+                        {{ form.senado.label_tag }}
+                        {{ form.senado }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group clearfix">
+                    <div class="icheck-primary d-inline">
+                        {{ form.pagado.label_tag }}
+                        {{ form.senado }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="guardar-reserva">Guardar</button>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        //Fecha inicio
+        $('#reservacioninicio').datetimepicker({ icons: { time: 'far fa-clock' } });
+
+        //Fecha fin
+        $('#reservacionfin').datetimepicker({ icons: { time: 'far fa-clock' } });
+
+        // Manejar el evento click del botón 'Guardar'
+        $('#guardar-reserva').on('click', function (e) {
+            e.preventDefault();
+
+            // Realizar la validación del formulario antes de enviarlo
+            $.ajax({
+                url: '{% url "reserva_app:reserva_create" %}',
+                type: 'POST',
+                data: $('#form-nueva-reserva').serialize(),
+                success: function (data) {
+                    // Verificar el estado de la respuesta
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Reserva guardada',
+                            text: data.message,  
+                            confirmButtonText: 'Ir a Reservas',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Si el usuario hace clic en "Ir a Reservas", redirige
+                                window.location.href = '/reservas/reservas/';
+                            }
+                        });
+                    } else {
+                        // En caso de error, mostrar SweetAlert con el mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.errors.__all__[0],  
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>

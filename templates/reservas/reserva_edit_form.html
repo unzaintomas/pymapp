@@ -1,0 +1,144 @@
+<form id="form-editar-reserva" data-reserva-id="{{ reserva.id }}">
+    <div class="modal-body">
+        {% csrf_token %}
+        <input type="hidden" id="reserva-id" name="reserva_id" value="{{ reserva.id }}">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.fecha_inicio.label_tag }}
+                    <div class="input-group date" id="reservacioninicio" data-target-input="nearest">
+                        {{ form.fecha_inicio }}
+                        <div class="input-group-append" data-target="#reservacioninicio" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.fecha_fin.label_tag }}
+                    <div class="input-group date" id="reservacionfin" data-target-input="nearest">
+                        {{ form.fecha_fin }}
+                        <div class="input-group-append" data-target="#reservacionfin" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    {{ form.cliente.label_tag }}
+                    {{ form.cliente }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.precio.label_tag }}
+                    {{ form.precio }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                {{ form.operador.label_tag }}
+                {{ form.operador }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group clearfix">
+                    <div class="icheck-primary d-inline">
+                        {{ form.senado.label_tag }}
+                        {{ form.senado }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group clearfix">
+                    <div class="icheck-primary d-inline">
+                        {{ form.pagado.label_tag }}
+                        {{ form.pagado }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="editar-reserva" data-reserva-id="{{ form.id }}">Guardar</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        // Obtener los valores de las fechas desde Django
+        var fechaInicioValue = $('#id_fecha_inicio').val();
+        var fechaFinValue = $('#id_fecha_fin').val();
+
+        // Formatear las fechas usando Moment.js
+        var fechaInicioFormatted = moment(fechaInicioValue).format('MM/DD/YYYY h:mm A');
+        var fechaFinFormatted = moment(fechaFinValue).format('MM/DD/YYYY h:mm A');
+
+        // Setear los valores formateados de las fechas en los campos del formulario
+        $('#id_fecha_inicio').val(fechaInicioFormatted);
+        $('#id_fecha_fin').val(fechaFinFormatted);
+
+        // Inicializar los datetimepickers
+        $('#reservacioninicio').datetimepicker({
+            format: 'MM/DD/YYYY h:mm A',
+            icons: {
+                time: 'far fa-clock',
+            },
+        });
+
+        $('#reservacionfin').datetimepicker({
+            format: 'MM/DD/YYYY h:mm A',
+            icons: {
+                time: 'far fa-clock',
+            },
+        });
+
+        // Manejar el evento click del botón 'Guardar'
+        $('#editar-reserva').on('click', function (e) {
+            e.preventDefault();
+            var reservaId = $('#reserva-id').val();
+            //console.log(reservaId)
+
+            // Realizar la validación del formulario antes de enviarlo
+            $.ajax({
+                url: '{% url "reserva_app:reserva_edit" 1 %}'.replace('1', reservaId),
+                type: 'POST',
+                data: $('#form-editar-reserva').serialize(),
+                success: function (data) {
+                    // Verificar el estado de la respuesta
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Reserva editada',
+                            text: data.message,  
+                            confirmButtonText: 'Ir a Reservas',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Si el usuario hace clic en "Ir a Reservas", redirige
+                                window.location.href = '/reservas/reservas/';
+                            }
+                        });
+                    } else {
+                        // En caso de error, mostrar SweetAlert con el mensaje de error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.errors.__all__[0],  
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
