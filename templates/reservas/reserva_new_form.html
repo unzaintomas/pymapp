@@ -1,6 +1,40 @@
-<form id="form-nueva-reserva" action="{% url 'reserva_app:reserva_create' %}" method="post">
+<form id="form-nueva-reserva">
+    {% csrf_token %}
     <div class="modal-body">
-        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    {{ form.horario.label_tag }}
+                    {{ form.horario }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.hora_inicio.label_tag }}
+                    <div class="input-group date" id="horainicioreserva" data-target-input="nearest">
+                        {{ form.hora_inicio }}
+                        <div class="input-group-append" data-target="#horainicioreserva" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="far fa-clock"></i></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.hora_fin.label_tag }}
+                    <div class="input-group date" id="horafinreserva" data-target-input="nearest">
+                        {{ form.hora_fin }}
+                        <div class="input-group-append" data-target="#horafinreserva" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="far fa-clock"></i></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
@@ -11,7 +45,6 @@
                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
             <div class="col-md-6">
@@ -30,15 +63,29 @@
             <div class="col-md-12">
                 <div class="form-group">
                     {{ form.cliente.label_tag }}
-                    {{ form.cliente }}
+                    <div class="input-group input-group-sm">
+                        {{ form.cliente }}
+                        <span class="input-group-append">
+                            <button type="button" class="btn btn-success btn-sm agregar-cliente" data-toggle="modal"
+                                data-target="#cliente-modal-nuevo">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <div class="form-group">
                     {{ form.precio.label_tag }}
                     {{ form.precio }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.monto_sena.label_tag }}
+                    {{ form.monto_sena }}
                 </div>
             </div>
         </div>
@@ -66,17 +113,118 @@
         <button type="submit" class="btn btn-primary" id="guardar-reserva">Guardar</button>
     </div>
 </form>
+<div class="modal fade" id="cliente-modal-nuevo">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Nuevo Cliente</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-new-cliente">
+
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 <script>
     $(document).ready(function () {
-        //Fecha inicio
-        $('#reservacioninicio').datetimepicker({ icons: { time: 'far fa-clock' } });
+        //Date picker
+        $('#reservacioninicio').datetimepicker({
+            format: 'DD/MM/YYYY'
+        });
 
-        //Fecha fin
-        $('#reservacionfin').datetimepicker({ icons: { time: 'far fa-clock' } });
+        //Date picker
+        $('#reservacionfin').datetimepicker({
+            format: 'DD/MM/YYYY'
+        });
+
+        //Timepicker
+        $('#horainicioreserva').datetimepicker({
+            format: 'HH:mm'
+        });
+
+        //Timepicker
+        $('#horafinreserva').datetimepicker({
+            format: 'HH:mm'
+        });
+
+        // Al cargar la página, establecer las horas y deshabilitar los campos
+        $('#id_hora_inicio').val('09:00');
+        $('#id_hora_fin').val('19:00');
+
+        // Al cargar la página, ajustar la fecha de fin inicial
+        ajustarFechaFin();
+
+        // Manejar el cambio en el selector de horario
+        $('#id_horario').on('change', function () {
+            var selectedHorario = $(this).val();
+
+            // Deshabilitar ambos campos de hora por defecto
+            //$('#id_hora_inicio').prop('disabled', true);
+            //$('#id_hora_fin').prop('disabled', true);
+
+            if (selectedHorario === '09-19') {
+                // Si es de 09 a 19, establecer las horas correspondientes
+                $('#id_hora_inicio').val('09:00');
+                $('#id_hora_fin').val('19:00');
+            } else if (selectedHorario === '21-07') {
+                // Si es otra opción, establecer las horas correspondientes
+                $('#id_hora_inicio').val('21:00');
+                $('#id_hora_fin').val('07:00');
+            } else if (selectedHorario === 'personalizado') {
+                // Si es personalizado, habilitar los campos de hora
+                $('#id_hora_inicio').prop('disabled', false);
+                $('#id_hora_fin').prop('disabled', false);
+            }
+
+            // Ajustar la fecha de fin al cambiar el horario
+            ajustarFechaFin();
+        });
+
+        // Manejar el cambio en la fecha de inicio
+        $('#reservacioninicio').on('change', function () {
+            // Ajustar la fecha de fin cuando cambia la fecha de inicio
+            ajustarFechaFin();
+        });
+
+        $('#reservacionfin').on('click', function () {
+            // Ajustar la fecha de fin cuando cambia la fecha de inicio
+            ajustarFechaFin();
+        });
+
+        // Función para ajustar dinámicamente la fecha de fin
+        function ajustarFechaFin() {
+            var fechaInicio = $('#id_fecha_inicio').val();
+            var horaInicio = $('#id_hora_inicio').val();
+            var horaFin = $('#id_hora_fin').val();
+
+            // Verificar si hay una fecha de inicio y horas definidas
+            if (fechaInicio && horaInicio && horaFin) {
+                var fechaFin = fechaInicio;
+
+                // Comparar las horas de inicio y fin
+                if (horaInicio > horaFin) {
+                    // Si la hora de inicio es mayor, agregar un día a la fecha de fin
+                    var nuevaFechaFin = moment(fechaFin, 'DD/MM/YYYY').add(1, 'days').format('DD/MM/YYYY');
+                    console.log(nuevaFechaFin)
+                    $('#id_fecha_fin').val(nuevaFechaFin);
+                } else {
+                    // Si la hora de inicio no es mayor, mantener la misma fecha de inicio
+                    $('#id_fecha_fin').val(fechaFin);
+                }
+            }
+        }
 
         // Manejar el evento click del botón 'Guardar'
         $('#guardar-reserva').on('click', function (e) {
             e.preventDefault();
+
+            console.log($('#form-nueva-reserva').serialize());
 
             // Realizar la validación del formulario antes de enviarlo
             $.ajax({
@@ -89,7 +237,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'Reserva guardada',
-                            text: data.message,  
+                            text: data.message,
                             confirmButtonText: 'Ir a Reservas',
                         }).then((result) => {
                             if (result.isConfirmed) {
@@ -98,13 +246,45 @@
                             }
                         });
                     } else {
-                        // En caso de error, mostrar SweetAlert con el mensaje de error
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.errors.__all__[0],  
-                        });
+                        console.log(data.errors);
+
+                        if (data.errors) {
+                            // Verificar errores generales (__all__)
+                            if (data.errors.__all__) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.errors.__all__[0],
+                                });
+                            } else {
+                                // Iterar sobre los campos y mostrar mensajes de error
+                                Object.keys(data.errors).forEach(function (field) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: data.errors[field][0],
+                                    });
+                                });
+                            }
+                        } 
+
                     }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        $('.agregar-cliente').on('click', function () {
+            // Hacer una solicitud Ajax para obtener el formulario de nuevo cliente
+            $.ajax({
+                url: '/personas/cliente/new/',
+                type: 'GET',
+                success: function (data) {
+                    // Insertar el formulario directamente en el modal
+                    $('#cliente-modal-nuevo .modal-body-new-cliente').html(data);
+                    $('#cliente-modal-nuevo').modal('show');
                 },
                 error: function (error) {
                     console.log(error);

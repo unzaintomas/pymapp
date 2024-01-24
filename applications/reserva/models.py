@@ -4,14 +4,24 @@ from applications.persona.models import Cliente
 
 # Create your models here.
 class Reserva(models.Model):
-    fecha_inicio = models.DateTimeField('Fecha y Hora de Inicio')
-    fecha_fin = models.DateTimeField('Fecha y Hora de Fin')
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    precio = models.DecimalField('Precio', max_digits=10, decimal_places=2)
+    HORARIO_CHOICES = [
+        ('09-19', '09:00 - 19:00'),
+        ('21-07', '21:00 - 07:00'),
+        ('personalizado', 'Personalizado'),
+    ]
+
+    horario = models.CharField('Horario', max_length=15, choices=HORARIO_CHOICES, default='09-19')
+    fecha_inicio = models.DateField('Fecha de Inicio', auto_now=False, auto_now_add=False, null=False, blank=False)
+    fecha_fin = models.DateField('Fecha de Fin', auto_now=False, auto_now_add=False, null=False, blank=False)
+    hora_inicio = models.TimeField('Hora de fin', auto_now=False, auto_now_add=False, null=False, blank=False)
+    hora_fin = models.TimeField('Hora de inicio', auto_now=False, auto_now_add=False, null=False, blank=False)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, null=False, blank=False)
+    precio = models.DecimalField('Precio', max_digits=10, decimal_places=2, null=False, blank=False)
     operador = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     # Información de pagos
     senado = models.BooleanField('Seña pagada', default=False)
+    monto_sena = models.DecimalField('Monto de Seña', max_digits=10, decimal_places=2, null=True, blank=True)
     pagado = models.BooleanField('Pagado totalmente', default=False)
 
     # Campo para rastrear si la reserva ha sido cancelada

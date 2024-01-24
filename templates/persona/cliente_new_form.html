@@ -50,8 +50,18 @@
                             confirmButtonText: 'Continuar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Si el usuario hace clic en "Continuar", redirige
-                                window.location.href = '/personas/clientes/';
+                                // Verificar si estamos en la vista de reservas
+                                if (window.location.pathname.includes('reservas/reservas')) {
+                                    var clienteSelector = $('#id_cliente');
+                                    clienteSelector.append('<option value="' + data.cliente.id + '" selected>' + data.cliente.nombre + ' </option>');
+                                    // Si estamos en la vista de reservas, cerrar el modal sin redirigir
+                                    $('#cliente-modal-nuevo').modal('hide');
+                                    // Puedes agregar aquí lógica adicional para actualizar el selector de clientes
+                                    console.log('desde reservas')
+                                } else {
+                                    // Si no, redirigir a la grilla de clientes
+                                    window.location.href = '/personas/clientes/';
+                                }
                             }
                         });
                     } else {

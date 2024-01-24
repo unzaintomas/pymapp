@@ -7,4 +7,4 @@ class Cliente(models.Model):
     email = models.EmailField('Email', blank=True, null=True)
 
     def __str__(self):
-        return str(self.id) + ' - ' + self.nombre
+        return self.nombre

@@ -36,8 +36,14 @@ def cliente_create(request):
         if form.is_valid():
             #form.save()
             #return redirect('persona_app:cliente_list')
-            reserva = form.save()
-            return JsonResponse({'status': 'success', 'message': 'Cliente registrado exitosamente'})
+            cliente = form.save()
+            cliente_data = {
+                'id': cliente.id,
+                'nombre': cliente.nombre,
+                'celular': cliente.celular,
+                'email': cliente.email
+            }
+            return JsonResponse({'status': 'success', 'message': 'Cliente registrado exitosamente', 'cliente': cliente_data})
         else:
             return JsonResponse({'status': 'error', 'errors': form.errors})
     else:
@@ -54,7 +60,9 @@ def cliente_edit(request, pk):
         if form.is_valid():
             #form.save()
             #return redirect('persona_app:cliente_list')
-            reserva = form.save()
+            cliente = form.save()
+            # Devolver información del nuevo cliente en formato JSON
+            
             return JsonResponse({'status': 'success', 'message': 'Cliente actualizado exitosamente'})
         else:
             return JsonResponse({'status': 'error', 'errors': form.errors})

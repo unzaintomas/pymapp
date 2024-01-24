@@ -36,8 +36,10 @@ Reservas
                 <tr>
                     <td>{{reserva.id}}</td>
                     <td>{{reserva.cliente.nombre}}</td>
-                    <td>{{ reserva.fecha_inicio|date:"d/m/Y" }} a {{ reserva.fecha_fin|date:"d/m/Y" }} <br>
-                        {{ reserva.fecha_inicio|date:"H:i" }} - {{ reserva.fecha_fin|date:"H:i" }}</td>
+                    <td>
+                        {{ reserva.fecha_inicio|date:"d/m/Y" }} a {{ reserva.fecha_fin|date:"d/m/Y" }} <br>
+                        {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}
+                    </td>
                     <td>
                         {% if reserva.senado %}
                             <span class="badge bg-success">Señado</span>

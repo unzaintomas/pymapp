@@ -4,22 +4,25 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import Reserva
 from .forms import ReservaForm
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from copy import deepcopy
 
-@login_required
+
 def reservas_json(request):
     reservas = Reserva.objects.filter(cancelada=False)
 
     eventos = []
     for reserva in reservas:
-        title = f" - {reserva.fecha_fin.strftime('%H:%M')} {reserva.cliente.nombre}"
+        fecha_inicio = reserva.fecha_inicio.strftime('%Y-%m-%d') + ' ' + reserva.hora_inicio.strftime('%H:%M:%S')
+        fecha_fin = reserva.fecha_fin.strftime('%Y-%m-%d') + ' ' + reserva.hora_fin.strftime('%H:%M:%S')
+
+        title = f" - {reserva.hora_fin.strftime('%H:%M')} {reserva.cliente.nombre}"
         eventos.append({
             'title': title,
-            'start': reserva.fecha_inicio.strftime('%Y-%m-%dT%H:%M:%S'),  # Formato ISO 8601
-            'end': reserva.fecha_fin.strftime('%Y-%m-%dT%H:%M:%S'),  # Formato ISO 8601
-            'display': title  # Especifica el texto que se mostrará en el evento
+            'start': fecha_inicio,
+            'end': fecha_fin,
+            'display': title
         })
 
     return JsonResponse(eventos, safe=False)
@@ -36,19 +39,26 @@ def reserva_create(request):
     if request.method == 'POST':
         # Crear una copia modificable del objeto QueryDict
         mutable_post_data = deepcopy(request.POST)
+        print(request.POST)
 
         # Modificar la copia según sea necesario
         fecha_inicio_str = mutable_post_data.get('fecha_inicio', '')
         fecha_fin_str = mutable_post_data.get('fecha_fin', '')
+        hora_inicio_str = mutable_post_data.get('hora_inicio', '')
+        hora_fin_str = mutable_post_data.get('hora_fin', '')
 
         try:
-            fecha_inicio = datetime.strptime(fecha_inicio_str, '%m/%d/%Y %I:%M %p')
-            fecha_fin = datetime.strptime(fecha_fin_str, '%m/%d/%Y %I:%M %p')
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%d/%m/%Y')
+            fecha_fin = datetime.strptime(fecha_fin_str, '%d/%m/%Y')
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+            hora_fin = datetime.strptime(hora_fin_str, '%H:%M').time()
         except ValueError:
             return JsonResponse({'status': 'error', 'errors': 'Formato de fecha y hora no válido'})
 
         mutable_post_data['fecha_inicio'] = fecha_inicio
         mutable_post_data['fecha_fin'] = fecha_fin
+        mutable_post_data['hora_inicio'] = hora_inicio
+        mutable_post_data['hora_fin'] = hora_fin
 
         # Asignar automáticamente el operador logueado al campo 'operador' del formulario
         mutable_post_data['operador'] = request.user.id
@@ -57,8 +67,6 @@ def reserva_create(request):
         form = ReservaForm(mutable_post_data)
 
         if form.is_valid():
-            #form.save()
-            #return redirect('reserva_app:reserva_list')
             reserva = form.save()
             return JsonResponse({'status': 'success', 'message': 'Reserva creada exitosamente'})
         else:
@@ -79,22 +87,33 @@ def reserva_edit(request, pk):
         # Modificar la copia según sea necesario
         fecha_inicio_str = mutable_post_data.get('fecha_inicio', '')
         fecha_fin_str = mutable_post_data.get('fecha_fin', '')
+        hora_inicio_str = mutable_post_data.get('hora_inicio', '')
+        hora_fin_str = mutable_post_data.get('hora_fin', '')
 
         try:
-            fecha_inicio = datetime.strptime(fecha_inicio_str, '%m/%d/%Y %I:%M %p')
-            fecha_fin = datetime.strptime(fecha_fin_str, '%m/%d/%Y %I:%M %p')
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%d/%m/%Y')
+            fecha_fin = datetime.strptime(fecha_fin_str, '%d/%m/%Y')
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+            hora_fin = datetime.strptime(hora_fin_str, '%H:%M').time()
         except ValueError:
             return JsonResponse({'status': 'error', 'errors': 'Formato de fecha y hora no válido'})
 
         mutable_post_data['fecha_inicio'] = fecha_inicio
         mutable_post_data['fecha_fin'] = fecha_fin
+        mutable_post_data['hora_inicio'] = hora_inicio
+        mutable_post_data['hora_fin'] = hora_fin
 
         # Crear un nuevo formulario con la copia modificada
         form = ReservaForm(mutable_post_data, instance=reserva)
-        #form = ReservaForm(request.POST, instance=reserva)
+
         if form.is_valid():
-            #form.save()
-            #return redirect('reserva_app:reserva_list')
+            if form.cleaned_data['horario'] == '09-19':
+                form.cleaned_data['hora_inicio'] = datetime.strptime('09:00', '%H:%M').time()
+                form.cleaned_data['hora_fin'] = datetime.strptime('07:00', '%H:%M').time()
+            elif form.cleaned_data['horario'] == '21-07':
+                form.cleaned_data['hora_inicio'] = datetime.strptime('09:00', '%H:%M').time()
+                form.cleaned_data['hora_fin'] = datetime.strptime('07:00', '%H:%M').time()
+
             reserva = form.save()
             return JsonResponse({'status': 'success', 'message': 'Reserva actualizada exitosamente'})
         else:

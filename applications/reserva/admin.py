@@ -1,5 +1,8 @@
 from django.contrib import admin
 from .models import Reserva
 
-# Register your models here.
-admin.site.register(Reserva)
+
+class ReservaAdmin(admin.ModelAdmin):
+    list_display = ('cliente', 'fecha_inicio', 'fecha_fin', 'hora_inicio', 'hora_fin', 'precio', 'monto_sena', 'senado', 'pagado')
+
+admin.site.register(Reserva, ReservaAdmin)
