@@ -12,11 +12,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'dbpym',
-<<<<<<< HEAD
         'USER': 'postgres',#'pymapp',
-=======
-        'USER': 'pymapp',
->>>>>>> 5b85c461a413f0019ff6dcce6b60f44c8b8e5b10
         'PASSWORD': 'masterkey',
         'HOST': 'localhost',
         'PORT': 5432
